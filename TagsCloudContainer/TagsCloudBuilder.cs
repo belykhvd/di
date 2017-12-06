@@ -40,23 +40,55 @@ namespace TagsCloudContainer
         {
             var words = wordsSource.GetWords(filename);
             var preprocessedWords = wordsPreprocessor.ProcessWords(words);
-
-            //TODO: words to rectangles
-            var bitmap = new Bitmap(700, 700);
+            
+            var bitmap = new Bitmap(formatter.ImageSize.Width, formatter.ImageSize.Height);
             var graphics = Graphics.FromImage(bitmap);
-            graphics.FillRectangle(Brushes.Black, new Rectangle(0, 0, 700, 700));
-
-            foreach (var word in preprocessedWords)
+            graphics.FillRectangle(formatter.BackgroundBrush,
+                new Rectangle(0, 0, bitmap.Width, bitmap.Height));
+            
+            var fontSizeMapping = GetFrequencyBasedFontSizeMapping(preprocessedWords, 1, 5);
+            foreach (var mapping in fontSizeMapping)
             {
-                layouter.PutNextRectangle(new Size(15, 15));
-            }
-            graphics.DrawRectangles(new Pen(Color.DarkBlue), layouter.GetLayout().ToArray());
+                var word = mapping.Item1;
+                var fontSize = mapping.Item2;
+
+                var font = new Font(formatter.FontFamily, 15 + fontSize * 5);
+                var size = Size.Ceiling(graphics.MeasureString(word, font));                
+                graphics.DrawString(word, font, formatter.FontBrush, layouter.PutNextRectangle(size));
+            }                        
 
             return new TagsCloudBuilder(this, bitmap);
         }
 
-        //private IReadOnlyDictionary<>
+        private static IEnumerable<Tuple<string, int>> GetFrequencyBasedFontSizeMapping(
+            IEnumerable<string> words, int minFontSize, int maxFontSize)
+        {
+            var frequencyCounter = new Dictionary<string, int>();
+            foreach (var word in words)
+            {
+                if (!frequencyCounter.ContainsKey(word))
+                    frequencyCounter[word] = 0;
+                frequencyCounter[word]++;
+            }
 
+            var sortedFrequencyGroups = frequencyCounter.GroupBy(pair => pair.Value).ToList();            
+            sortedFrequencyGroups.Sort((firstGroup, secondGroup) => -firstGroup.Key.CompareTo(secondGroup.Key));
+
+            var sizesCount = maxFontSize - minFontSize + 1;
+            var groupsCount = sortedFrequencyGroups.Count;
+            var ratio = (int) Math.Ceiling((double)groupsCount / sizesCount);
+
+            IEnumerable<Tuple<string, int>> mapping = new List<Tuple<string, int>>();            
+            for (var i = 0; i < groupsCount; i++)
+            {
+                var currentSize = maxFontSize - (i + 1) / ratio;
+                mapping = mapping
+                    .Concat(sortedFrequencyGroups[i].Select(pair => Tuple.Create(pair.Key, currentSize)));
+            }
+
+            return mapping;
+        }
+                
         public void SaveToFile(string filename)
         {
             saver.Save(cloudImage, filename);            

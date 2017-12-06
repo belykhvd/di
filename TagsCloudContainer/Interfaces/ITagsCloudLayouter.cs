@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace TagsCloudContainer
 {
     internal interface ITagsCloudLayouter
     {        
-        Rectangle PutNextRectangle(Size rectangleSize);
-        IEnumerable<Rectangle> GetLayout();
+        Rectangle PutNextRectangle(Size rectangleSize);        
     }
 }

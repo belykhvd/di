@@ -4,16 +4,14 @@ using System.Drawing;
 using System.Linq;
 using TagsCloudContainer;
 
-namespace TagCloudVisualization
+namespace TagsCloudContainer
 {
     internal class CircularCloudLayouter : ITagsCloudLayouter
     {
         private readonly List<Rectangle> layout = new List<Rectangle>();
         private double helixParameter;
 
-        public readonly Point CenterCoordinates;
-
-        public IEnumerable<Rectangle> GetLayout() => layout;
+        public readonly Point CenterCoordinates;        
         
         public CircularCloudLayouter(Point center)
         {

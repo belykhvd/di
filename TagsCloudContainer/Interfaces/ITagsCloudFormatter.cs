@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 
 namespace TagsCloudContainer
 {
     internal interface ITagsCloudFormatter
     {
+        Brush BackgroundBrush { get; }
+        Brush FontBrush { get; }
+        FontFamily FontFamily { get; }
+        Size ImageSize { get; }        
     }
 }

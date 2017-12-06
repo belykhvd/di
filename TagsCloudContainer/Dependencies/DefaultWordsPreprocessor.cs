@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using NHunspell;
 
 namespace TagsCloudContainer
@@ -7,14 +8,7 @@ namespace TagsCloudContainer
     {
         public IEnumerable<string> ProcessWords(IEnumerable<string> words)
         {
-            var wordsSet = new HashSet<string>();
-            //using (var hunspell = new Hunspell("ru_eng.aff", "ru_eng.dic"))            
-            foreach (var word in words)
-            {                    
-                if (word.Length > 3)
-                    wordsSet.Add(word.ToLower());
-            }            
-            return wordsSet;
+            return words.Select(word => word.ToLower());
         }
     }
 }
