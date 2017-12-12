@@ -1,7 +1,12 @@
-﻿using System.Drawing;
+﻿using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.IO;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using CommandLine;
+using TagsCloudContainer.Dependencies;
+using TagsCloudContainer.Interfaces;
 
 namespace TagsCloudContainer
 {
@@ -14,18 +19,6 @@ namespace TagsCloudContainer
 
             [Option('o', "output", Required = true, HelpText = "Output file where to write tags cloud")]
             public string OutputFile { get; set; }
-
-            [Option("back", HelpText = nameof(BackgroundBrush))]
-            public Brush BackgroundBrush { get; set; }
-
-            [Option("font", HelpText = nameof(FontBrush))]
-            public Brush FontBrush { get; set; }
-
-            [Option("fontfamily", HelpText = nameof(FontFamily))]
-            public FontFamily FontFamily { get; set; }
-
-            [Option("size", HelpText = "Size of the image")]
-            public Size ImageSize { get; set; }
         }
 
         private static void Main(string[] args)
@@ -33,31 +26,41 @@ namespace TagsCloudContainer
             var options = new CommandLineOptions();
             Parser.Default.ParseArguments(args, options);
 
-            var container = new WindsorContainer();
-            container.Register(Component.For<IWordsSource>().ImplementedBy<RawTextReader>());
-            container.Register(Component.For<IWordsPreprocessor>().ImplementedBy<DefaultWordsPreprocessor>());
-            
-            container.Register(Component.For<ITagsCloudFormatter>().ImplementedBy<DefaultTagsCloudFormatter>()
-                .DependsOn(
-                    Property.ForKey(nameof(options.BackgroundBrush)).Eq(options.BackgroundBrush ?? Brushes.Black),
-                    Property.ForKey("FontBrush").Eq(Brushes.DarkOrange),
-                    Property.ForKey("FontFamily").Eq(FontFamily.GenericMonospace),
-                    Property.ForKey("ImageSize").Eq(new Size(300, 300))
-                ));                        
+            var container = new WindsorContainer()
+                .Register(Component.For<IWordsSource>().ImplementedBy<RawTextReader>()
+                    .DependsOn(Dependency.OnValue("sourceFilePath", options.InputFile)));
 
-            container.Register(Component.For<ITagsCloudLayouter>().ImplementedBy<CircularCloudLayouter>()
-                .DynamicParameters((k, d) =>
-                    {
-                        var imageSize = container.Resolve<ITagsCloudFormatter>().ImageSize;
-                        d["center"] = new Point(imageSize.Width / 2, imageSize.Height / 2);
-                    }
-                ));
+            var stopWords = new HashSet<string>(File.ReadLines("stopwords.txt"));
+            container.Register(Component.For<IWordsNormalizer>().ImplementedBy<DefaultWordsNormalizer>());
+            container.Register(Component.For<IWordsFilter>().ImplementedBy<DefaultWordsFilter>()
+                .DependsOn(Dependency.OnValue("stopWords", stopWords)));
 
-            container.Register(Component.For<ITagsCloudSaver>().ImplementedBy<PNGTagsCloudSaver>());
-            container.Register(Component.For<TagsCloudBuilder>().ImplementedBy<TagsCloudBuilder>());
+            container
+                .Register(Component.For<ITagsCloudFormatter>().ImplementedBy<DefaultTagsCloudFormatter>()
+                    .DependsOn(
+                        Property.ForKey("FontFamily").Eq(FontFamily.GenericMonospace),
+                        Property.ForKey("BackgroundBrush").Eq(Brushes.Black),
+                        Property.ForKey("FontBrush").Eq(Brushes.DarkOrange),                        
+                        Property.ForKey("ImageSize").Eq(new Size(300, 300))
+                    ))
+                .Register(Component.For<ITagsCloudLayouter>().ImplementedBy<CircularCloudLayouter>()
+                    .DynamicParameters((k, d) =>
+                        {
+                            var imageSize = container.Resolve<ITagsCloudFormatter>().ImageSize;
+                            d["center"] = new Point(imageSize.Width / 2, imageSize.Height / 2);
+                        }
+                    ))
+                .Register(Component.For<ITagsCloudRenderer>().ImplementedBy<DefaultTagsCloudRenderer>());
 
-            var tagsCloudBuilder = container.Resolve<TagsCloudBuilder>();
-            tagsCloudBuilder.Build(options.InputFile).SaveToFile(options.OutputFile);
+            container.Register(Component.For<ITagsCloudSaver>().ImplementedBy<PngTagsCloudSaver>()
+                .DependsOn(Dependency.OnValue("filename", options.OutputFile)));
+
+            var words = container.Resolve<IWordsSource>().GetWords();
+            var tokens = words
+                .Select(container.Resolve<IWordsNormalizer>().Normalize)
+                .Where(container.Resolve<IWordsFilter>().IsNotStopWord);
+            var tagsCloudBitmap = container.Resolve<ITagsCloudRenderer>().Render(tokens);
+            container.Resolve<ITagsCloudSaver>().Save(tagsCloudBitmap);
         }
     }
 }

@@ -1,12 +1,12 @@
 ﻿using System.Drawing;
 
-namespace TagsCloudContainer
+namespace TagsCloudContainer.Interfaces
 {
     internal interface ITagsCloudFormatter
     {
-        Brush BackgroundBrush { get; }
-        Brush FontBrush { get; }
         FontFamily FontFamily { get; }
-        Size ImageSize { get; }        
+        Brush BackgroundBrush { get; }
+        Brush FontBrush { get; }        
+        Size ImageSize { get; }
     }
 }

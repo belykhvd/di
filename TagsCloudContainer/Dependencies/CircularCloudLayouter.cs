@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using TagsCloudContainer;
+using TagsCloudContainer.Interfaces;
 
-namespace TagsCloudContainer
+namespace TagsCloudContainer.Dependencies
 {
     internal class CircularCloudLayouter : ITagsCloudLayouter
     {

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace TagsCloudContainer
+namespace TagsCloudContainer.Interfaces
 {
     internal interface IWordsSource
     {
-        IEnumerable<string> GetWords(string sourceFilePath);
+        IEnumerable<string> GetWords();
     }
 }

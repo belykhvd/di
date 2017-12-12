@@ -1,9 +1,9 @@
 ﻿using System.Drawing;
 
-namespace TagsCloudContainer
+namespace TagsCloudContainer.Interfaces
 {
     internal interface ITagsCloudSaver
     {
-        void Save(Bitmap image, string filename);
+        void Save(Bitmap image);
     }
 }

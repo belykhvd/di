@@ -1,11 +1,19 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
+using TagsCloudContainer.Interfaces;
 
-namespace TagsCloudContainer
+namespace TagsCloudContainer.Dependencies
 {
-    internal class PNGTagsCloudSaver : ITagsCloudSaver
+    internal class PngTagsCloudSaver : ITagsCloudSaver
     {
-        public void Save(Bitmap image, string filename)
+        private readonly string filename;
+
+        public PngTagsCloudSaver(string filename)
+        {
+            this.filename = filename;
+        }
+
+        public void Save(Bitmap image)
         {
             image.Save(filename, ImageFormat.Png);
         }

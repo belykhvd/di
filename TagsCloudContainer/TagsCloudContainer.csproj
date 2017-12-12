@@ -8,9 +8,10 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>TagsCloudContainer</RootNamespace>
     <AssemblyName>TagsCloudContainer</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -41,9 +42,6 @@
     <Reference Include="CommandLine, Version=1.9.71.2, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
       <HintPath>..\packages\CommandLineParser.1.9.71\lib\net45\CommandLine.dll</HintPath>
     </Reference>
-    <Reference Include="NHunspell, Version=1.2.5554.16953, Culture=neutral, PublicKeyToken=1ac793ea843b4366, processorArchitecture=MSIL">
-      <HintPath>..\packages\NHunspell.1.2.5554.16953\lib\net\NHunspell.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -60,38 +58,32 @@
   <ItemGroup>
     <Compile Include="Dependencies\CircularCloudLayouter.cs" />
     <Compile Include="Dependencies\DefaultTagsCloudFormatter.cs" />
-    <Compile Include="Dependencies\DefaultWordsPreprocessor.cs" />
-    <Compile Include="Dependencies\PNGTagsCloudSaver.cs" />
+    <Compile Include="Dependencies\DefaultTagsCloudRenderer.cs" />
+    <Compile Include="Dependencies\DefaultWordsFilter.cs" />
+    <Compile Include="Dependencies\DefaultWordsNormalizer.cs" />
+    <Compile Include="Dependencies\PngTagsCloudSaver.cs" />
     <Compile Include="Interfaces\ITagsCloudFormatter.cs" />
+    <Compile Include="Interfaces\IWordsNormalizer.cs" />
+    <Compile Include="Interfaces\ITagsCloudRenderer.cs" />
     <Compile Include="Interfaces\ITagsCloudLayouter.cs" />
     <Compile Include="Interfaces\ITagsCloudSaver.cs" />
-    <Compile Include="Interfaces\IWordsPreprocessor.cs" />
+    <Compile Include="Interfaces\IWordsFilter.cs" />
     <Compile Include="Interfaces\IWordsSource.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Dependencies\RawTextReader.cs" />
-    <Compile Include="TagsCloudBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-    <None Include="ru_eng.aff">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="ru_eng.dic">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="file.txt">
+    <Content Include="input.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="Hunspellx64.dll">
+    <Content Include="stopwords.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Hunspellx86.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
