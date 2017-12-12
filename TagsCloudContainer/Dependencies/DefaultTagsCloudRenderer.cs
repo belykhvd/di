@@ -23,13 +23,13 @@ namespace TagsCloudContainer.Dependencies
             var graphics = Graphics.FromImage(bitmap);
             graphics.FillRectangle(formatter.BackgroundBrush, new Rectangle(0, 0, bitmap.Width, bitmap.Height));
 
-            var fontSizeMapping = GetFrequencyBasedFontSizeMapping(tokens, 1, 5);
+            var fontSizeMapping = GetFrequencyBasedFontSizeMapping(tokens);
             foreach (var mapping in fontSizeMapping)
             {
                 var word = mapping.Item1;
                 var fontSize = mapping.Item2;
 
-                var font = new Font(formatter.FontFamily, 15 + fontSize * 5);
+                var font = new Font(formatter.FontFamily, fontSize);
                 var size = Size.Ceiling(graphics.MeasureString(word, font));
                 graphics.DrawString(word, font, formatter.FontBrush, layouter.PutNextRectangle(size));
             }
@@ -38,8 +38,8 @@ namespace TagsCloudContainer.Dependencies
         }
 
         private static IEnumerable<(string, int)> GetFrequencyBasedFontSizeMapping(
-            IEnumerable<string> words, int minFontSize, int maxFontSize)
-        {
+            IEnumerable<string> words, int sizesCount=5)
+        {            
             var frequencyCounter = new Dictionary<string, int>();
             foreach (var word in words)
             {
@@ -50,15 +50,14 @@ namespace TagsCloudContainer.Dependencies
 
             var sortedFrequencyGroups = frequencyCounter.GroupBy(pair => pair.Value).ToList();
             sortedFrequencyGroups.Sort((firstGroup, secondGroup) => -firstGroup.Key.CompareTo(secondGroup.Key));
-
-            var sizesCount = maxFontSize - minFontSize + 1;
+            
             var groupsCount = sortedFrequencyGroups.Count;
             var ratio = (int)Math.Ceiling((double)groupsCount / sizesCount);
                         
             IEnumerable<(string, int)> mapping = new List<(string, int)>();
             for (var i = 0; i < groupsCount; i++)
             {
-                var currentSize = maxFontSize - (i + 1) / ratio;
+                var currentSize = 15 + (sizesCount - (i + 1) / ratio) * 5;
                 mapping = mapping
                     .Concat(sortedFrequencyGroups[i].Select(pair => (pair.Key, currentSize)));
             }

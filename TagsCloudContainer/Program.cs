@@ -41,7 +41,7 @@ namespace TagsCloudContainer
                         Property.ForKey("FontFamily").Eq(FontFamily.GenericMonospace),
                         Property.ForKey("BackgroundBrush").Eq(Brushes.Black),
                         Property.ForKey("FontBrush").Eq(Brushes.DarkOrange),                        
-                        Property.ForKey("ImageSize").Eq(new Size(300, 300))
+                        Property.ForKey("ImageSize").Eq(new Size(500, 500))
                     ))
                 .Register(Component.For<ITagsCloudLayouter>().ImplementedBy<CircularCloudLayouter>()
                     .DynamicParameters((k, d) =>
