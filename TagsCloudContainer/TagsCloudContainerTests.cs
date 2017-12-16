@@ -33,15 +33,23 @@ namespace TagsCloudContainer
 
         [Test]
         public void ApprovalFunctionalTest_ShouldRenderUsingFormatter()
-        {            
-            //formatter.Setup(fmt => fmt.FontFamily).Returns(FontFamily.GenericMonospace);
-            //formatter.Object.FontFamily.Should().Be(FontFamily.GenericMonospace);
-            /*var formatter = Mock.Of<ITagsCloudFormatter>(d =>
-                d.FontFamily == FontFamily.GenericMonospace);
-            TestContext.WriteLine(formatter.FontFamily);*/
-            var formatter = A.Fake<ITagsCloudFormatter>();
-            A.CallTo(() => formatter.FontFamily).Returns(FontFamily.GenericMonospace);
-            formatter.FontFamily.Should().Be(FontFamily.GenericMonospace);
+        {
+            var formatterMock = new Mock<ITagsCloudFormatter>();            
+            formatterMock.SetupGet(m => m.FontFamily).Returns(FontFamily.GenericMonospace);
+            formatterMock.SetupGet(m => m.BackgroundBrush).Returns(Brushes.Black);
+            formatterMock.SetupGet(m => m.FontBrush).Returns(Brushes.Yellow);
+            formatterMock.SetupGet(m => m.ImageSize).Returns(new Size(700, 700));
+
+            var formatter = formatterMock.Object;
+
+            var layouter = new CircularCloudLayouter(formatter, new Point(300, 300));
+            var layout = layouter.GetLayout(new[] {"word", "word", "word", "anotherWord", "oneMoreWord"});
+
+            var renderer = new DefaultTagsCloudRenderer<Bitmap>(formatter);
+            var bitmap = renderer.Render(layout).GetRenderingResult();
+
+            var bitmapSaver = new PngTagsCloudSaver($"{nameof(ApprovalFunctionalTest_ShouldRenderUsingFormatter)}.png");
+            bitmapSaver.Save(bitmap);
         }
     }
 }
