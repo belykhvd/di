@@ -1,39 +1,5 @@
-﻿hello
-world
-HelLo
-World
-C#
-C#
-C#
-C#
-C#
-C#
-C#
-C#
-C#
-C#
-C#
-C#
-C#
-C#
-Python
-Python
-Python
-Python
-Python
-Python
-Python
-Java
-Intel 80386
-coding
-DI
-DI
-DI
-shpora
-TagsCloud
-interface
-class
-enumerable
-mocks
-anotherWord
-castleWindsor
+﻿I said in an earlier post that I believe that immutable objects are the way of the future in C#. I stand by that statement while at the same time noting that it is at this point sufficiently vague as to be practically meaningless! “Immutable” means different things to different people; different kinds of immutability have different pros and cons. I’d like to spend some time over the next few weeks talking about possible directions that C# could go to improve the developer experience when writing programs that use immutable objects, as well as giving some practical examples of the sort of immutable object programming you can do today.
+
+(Again, I want to emphasize that in these sorts of “future feature” posts we are all playfully hypothesizing and brainstorming about ideas for entirely hypothetical future versions of C#. We have not yet shipped C# 3.0 and have not announced that there will ever be any future version of the language. Nothing here should be construed as any kind of promise or announcement; we’re just geeks talking about programming languages, ‘cause that’s what we do.)
+
+So, disclaimers out of the way, what kinds of immutability are there? Lots. Here’s just a few. Note that these categories are not necessarily mutually exclusive!

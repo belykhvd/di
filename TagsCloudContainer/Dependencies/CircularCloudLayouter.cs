@@ -8,20 +8,67 @@ namespace TagsCloudContainer.Dependencies
 {
     internal class CircularCloudLayouter : ITagsCloudLayouter
     {
+        private readonly ITagsCloudFormatter formatter;
+
         private readonly List<Rectangle> layout = new List<Rectangle>();
         private double helixParameter;
 
         public readonly Point CenterCoordinates;        
         
-        public CircularCloudLayouter(Point center)
-        {
+        public CircularCloudLayouter(ITagsCloudFormatter formatter, Point center)
+        {            
             if (center.X < 0 || center.Y < 0)
-                throw new ArgumentException("Coordinates of cloud center must be non-negative");
-
-            CenterCoordinates = center;            
+                throw new ArgumentException("Coordinates of cloud center must be non-negative");            
+            
+            CenterCoordinates = center;
+            this.formatter = formatter;
         }
 
-        public Rectangle PutNextRectangle(Size rectangleSize)
+        public WordsLayout GetLayout(IEnumerable<string> words)
+        {
+            var graphics = Graphics.FromImage(new Bitmap(1, 1));
+            var wordsLayout = new WordsLayout();            
+
+            var fontSizeMapping = GetFrequencyBasedFontSizeMapping(words);
+            foreach (var mapping in fontSizeMapping)
+            {
+                var word = mapping.Item1;
+                var fontSize = mapping.Item2;
+                var font = new Font(formatter.FontFamily, fontSize);
+                var rectangleSize = Size.Ceiling(graphics.MeasureString(word, font));
+                wordsLayout = wordsLayout.With((PutNextRectangle(rectangleSize), font, word));                                
+            }
+            return wordsLayout;
+        }
+
+        private static IEnumerable<(string, int)> GetFrequencyBasedFontSizeMapping(
+            IEnumerable<string> words, int sizesCount = 5)
+        {
+            var frequencyCounter = new Dictionary<string, int>();
+            foreach (var word in words)
+            {
+                if (!frequencyCounter.ContainsKey(word))
+                    frequencyCounter[word] = 0;
+                frequencyCounter[word]++;
+            }
+
+            var sortedFrequencyGroups = frequencyCounter.GroupBy(pair => pair.Value).ToList();
+            sortedFrequencyGroups.Sort((firstGroup, secondGroup) => -firstGroup.Key.CompareTo(secondGroup.Key));
+
+            var groupsCount = sortedFrequencyGroups.Count;
+            var ratio = (int)Math.Ceiling((double)groupsCount / sizesCount);
+
+            IEnumerable<(string, int)> mapping = new List<(string, int)>();
+            for (var i = 0; i < groupsCount; i++)
+            {
+                var currentSize = 10 + (sizesCount - (i + 1) / ratio) * 5;
+                mapping = mapping.Concat(sortedFrequencyGroups[i].Select(pair => (pair.Key, currentSize)));
+            }
+
+            return mapping;
+        }
+
+        private Rectangle PutNextRectangle(Size rectangleSize)
         {
             if (rectangleSize.Width <= 0 || rectangleSize.Height <= 0)
                 throw new ArgumentException("Invalid size of rectangle: sides lengths must be positive");

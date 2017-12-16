@@ -40,8 +40,8 @@ namespace TagsCloudContainer
                     .DependsOn(
                         Property.ForKey("FontFamily").Eq(FontFamily.GenericMonospace),
                         Property.ForKey("BackgroundBrush").Eq(Brushes.Black),
-                        Property.ForKey("FontBrush").Eq(Brushes.DarkOrange),                        
-                        Property.ForKey("ImageSize").Eq(new Size(500, 500))
+                        Property.ForKey("FontBrush").Eq(Brushes.Yellow),                        
+                        Property.ForKey("ImageSize").Eq(new Size(700, 700))
                     ))
                 .Register(Component.For<ITagsCloudLayouter>().ImplementedBy<CircularCloudLayouter>()
                     .DynamicParameters((k, d) =>
@@ -50,7 +50,7 @@ namespace TagsCloudContainer
                             d["center"] = new Point(imageSize.Width / 2, imageSize.Height / 2);
                         }
                     ))
-                .Register(Component.For<ITagsCloudRenderer>().ImplementedBy<DefaultTagsCloudRenderer>());
+                .Register(Component.For<ITagsCloudRenderer<Bitmap>>().ImplementedBy<DefaultTagsCloudRenderer<Bitmap>>());
 
             container.Register(Component.For<ITagsCloudSaver>().ImplementedBy<PngTagsCloudSaver>()
                 .DependsOn(Dependency.OnValue("filename", options.OutputFile)));
@@ -59,8 +59,11 @@ namespace TagsCloudContainer
             var tokens = words
                 .Select(container.Resolve<IWordsNormalizer>().Normalize)
                 .Where(container.Resolve<IWordsFilter>().IsNotStopWord);
-            var tagsCloudBitmap = container.Resolve<ITagsCloudRenderer>().Render(tokens);
-            container.Resolve<ITagsCloudSaver>().Save(tagsCloudBitmap);
+            var layout = container.Resolve<ITagsCloudLayouter>().GetLayout(tokens);
+            var tagsCloudBitmap = container.Resolve<ITagsCloudRenderer<Bitmap>>()
+                .Render(layout)
+                .GetRenderingResult();
+            container.Resolve<ITagsCloudSaver>().Save(tagsCloudBitmap);            
         }
     }
 }

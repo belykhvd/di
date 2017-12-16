@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
-
-namespace TagsCloudContainer.Interfaces
+﻿namespace TagsCloudContainer.Interfaces
 {
-    internal interface ITagsCloudRenderer
+    internal interface ITagsCloudRenderer<T>
     {
-        Bitmap Render(IEnumerable<string> tokens);
+        ITagsCloudRenderer<T> Render(WordsLayout wordsLayout);
+        T GetRenderingResult();
     }
 }
