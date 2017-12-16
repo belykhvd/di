@@ -2,7 +2,7 @@
 
 namespace TagsCloudContainer.Interfaces
 {
-    internal interface ITagsCloudLayouter
+    public interface ITagsCloudLayouter
     {                
         WordsLayout GetLayout(IEnumerable<string> words);
     }

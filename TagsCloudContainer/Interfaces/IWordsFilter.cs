@@ -1,6 +1,6 @@
 ﻿namespace TagsCloudContainer.Interfaces
 {
-    internal interface IWordsFilter
+    public interface IWordsFilter
     {
         bool IsNotStopWord(string word);
     }

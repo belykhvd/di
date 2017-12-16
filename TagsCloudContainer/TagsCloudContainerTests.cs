@@ -6,11 +6,14 @@ using NUnit.Framework;
 using FluentAssertions;
 using Moq;
 using FakeItEasy;
+using ApprovalTests;
+using ApprovalTests.Reporters;
 using TagsCloudContainer.Dependencies;
 using TagsCloudContainer.Interfaces;
 
 namespace TagsCloudContainer
 {
+    [UseReporter(typeof(DiffReporter))]
     internal class TagsCloudContainerTests
     {
         [Test]
@@ -48,8 +51,11 @@ namespace TagsCloudContainer
             var renderer = new DefaultTagsCloudRenderer<Bitmap>(formatter);
             var bitmap = renderer.Render(layout).GetRenderingResult();
 
-            var bitmapSaver = new PngTagsCloudSaver($"{nameof(ApprovalFunctionalTest_ShouldRenderUsingFormatter)}.png");
-            bitmapSaver.Save(bitmap);
+            var filename = $"{nameof(ApprovalFunctionalTest_ShouldRenderUsingFormatter)}.png";
+            var bitmapSaver = new PngTagsCloudSaver(filename);
+            bitmapSaver.Save(bitmap);      
+                        
+            Approvals.VerifyFile(filename);
         }
     }
 }

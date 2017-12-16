@@ -2,7 +2,7 @@
 
 namespace TagsCloudContainer.Interfaces
 {
-    internal interface ITagsCloudFormatter
+    public interface ITagsCloudFormatter
     {
         FontFamily FontFamily { get; }
         Brush BackgroundBrush { get; }

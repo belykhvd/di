@@ -2,7 +2,7 @@
 
 namespace TagsCloudContainer.Interfaces
 {
-    internal interface IWordsSource
+    public interface IWordsSource
     {
         IEnumerable<string> GetWords();
     }

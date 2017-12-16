@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace TagsCloudContainer
 {
-    internal class WordsLayout
+    public class WordsLayout
     {
         [NotNull]
         public IEnumerable<(Rectangle, Font, string)> RectanglesWordsMapping { get; }

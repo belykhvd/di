@@ -1,6 +1,6 @@
 ﻿namespace TagsCloudContainer.Interfaces
 {
-    internal interface IWordsNormalizer
+    public interface IWordsNormalizer
     {
         string Normalize(string word);
     }
