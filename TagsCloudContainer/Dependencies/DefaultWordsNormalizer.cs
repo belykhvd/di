@@ -5,7 +5,14 @@ namespace TagsCloudContainer.Dependencies
 {
     internal class DefaultWordsNormalizer : IWordsNormalizer
     {
-        public string Normalize(string word) => RemovePunctuation(word.ToLower());
+        public Result<string> Normalize(string word)
+        {
+            if (string.IsNullOrWhiteSpace(word))
+                return Result.Fail<string>("Cannot normalize word: it's null or whitespace");
+
+            var normalizedWord = RemovePunctuation(word.ToLower());
+            return Result.Ok(normalizedWord);
+        }
 
         private static string RemovePunctuation(string word)
         {

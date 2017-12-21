@@ -24,7 +24,7 @@ namespace TagsCloudContainer.Dependencies
             this.formatter = formatter;
         }
 
-        public WordsLayout GetLayout(IEnumerable<string> words)
+        public Result<WordsLayout> GetLayout(IEnumerable<string> words)
         {
             var graphics = Graphics.FromImage(new Bitmap(1, 1));
             var wordsLayout = new WordsLayout();            
@@ -36,9 +36,14 @@ namespace TagsCloudContainer.Dependencies
                 var fontSize = mapping.Item2;
                 var font = new Font(formatter.FontFamily, fontSize);
                 var rectangleSize = Size.Ceiling(graphics.MeasureString(word, font));
-                wordsLayout = wordsLayout.With((PutNextRectangle(rectangleSize), font, word));                                
+                var rectangle = PutNextRectangle(rectangleSize);
+
+                if (rectangle.Left < 0)
+                    return Result.Fail<WordsLayout>("Cannot create words layout: size of cloud is bigger than bitmap");
+
+                wordsLayout = wordsLayout.With((rectangle, font, word));              
             }
-            return wordsLayout;
+            return Result.Ok(wordsLayout);
         }
 
         private static IEnumerable<(string, int)> GetFrequencyBasedFontSizeMapping(

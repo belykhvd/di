@@ -13,9 +13,9 @@ namespace TagsCloudContainer.Dependencies
             this.filename = filename;
         }
 
-        public void Save(Bitmap image)
+        public Result<None> Save(Bitmap image)
         {
-            image.Save(filename, ImageFormat.Png);
+            return Result.OfAction(() => image.Save(filename, ImageFormat.Png));
         }
     }
 }

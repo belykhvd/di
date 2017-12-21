@@ -12,6 +12,9 @@ namespace TagsCloudContainer.Dependencies
             this.stopWords = new HashSet<string>(stopWords);
         }
 
-        public bool IsNotStopWord(string word) => !stopWords.Contains(word);
+        public Result<bool> IsNotStopWord(string word)
+        {            
+            return Result.Ok(!string.IsNullOrWhiteSpace(word) && !stopWords.Contains(word));
+        }
     }
 }

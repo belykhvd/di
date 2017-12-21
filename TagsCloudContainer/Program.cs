@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.IO;
@@ -55,15 +56,22 @@ namespace TagsCloudContainer
             container.Register(Component.For<ITagsCloudSaver>().ImplementedBy<PngTagsCloudSaver>()
                 .DependsOn(Dependency.OnValue("filename", options.OutputFile)));
 
-            var words = container.Resolve<IWordsSource>().GetWords();
-            var tokens = words
-                .Select(container.Resolve<IWordsNormalizer>().Normalize)
-                .Where(container.Resolve<IWordsFilter>().IsNotStopWord);
-            var layout = container.Resolve<ITagsCloudLayouter>().GetLayout(tokens);
-            var tagsCloudBitmap = container.Resolve<ITagsCloudRenderer<Bitmap>>()
-                .Render(layout)
-                .GetRenderingResult();
-            container.Resolve<ITagsCloudSaver>().Save(tagsCloudBitmap);            
+            try
+            {
+                var words = container.Resolve<IWordsSource>().GetWords().GetValueOrThrow();
+                var normalizedWords = words
+                    .Select(word => container.Resolve<IWordsNormalizer>().Normalize(word).GetValueOrThrow());
+                var tokens = normalizedWords
+                    .Where(word => container.Resolve<IWordsFilter>().IsNotStopWord(word).GetValueOrThrow());
+                var layout = container.Resolve<ITagsCloudLayouter>().GetLayout(tokens).GetValueOrThrow();
+                var tagsCloudBitmap = container.Resolve<ITagsCloudRenderer<Bitmap>>().Render(layout).GetValueOrThrow();
+                container.Resolve<ITagsCloudSaver>().Save(tagsCloudBitmap).GetValueOrThrow();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.ReadKey(true);
+            }            
         }
     }
 }

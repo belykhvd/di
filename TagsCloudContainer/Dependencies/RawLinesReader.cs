@@ -13,6 +13,11 @@ namespace TagsCloudContainer.Dependencies
             this.sourceFilePath = sourceFilePath;
         }
 
-        public IEnumerable<string> GetWords() => File.ReadAllLines(sourceFilePath);
+        public Result<IEnumerable<string>> GetWords()
+        {
+            return !File.Exists(sourceFilePath) 
+                ? Result.Fail<IEnumerable<string>>($"Cannot find file with words: {sourceFilePath}") 
+                : Result.Ok(File.ReadLines(sourceFilePath));
+        }
     }
 }

@@ -99,6 +99,7 @@
     <Compile Include="Interfaces\IWordsFilter.cs" />
     <Compile Include="Interfaces\IWordsSource.cs" />
     <Compile Include="Dependencies\RawTextReader.cs" />
+    <Compile Include="Result.cs" />
     <Compile Include="WordsLayout.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

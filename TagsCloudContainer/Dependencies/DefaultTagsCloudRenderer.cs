@@ -12,29 +12,13 @@ namespace TagsCloudContainer.Dependencies
         {            
             this.formatter = formatter;
         }
-
-        private readonly Bitmap renderedBitmap;
-
-        private DefaultTagsCloudRenderer(DefaultTagsCloudRenderer<T> renderer, Bitmap bitmap)
-        {
-            formatter = renderer.formatter;
-            renderedBitmap = bitmap;
-        }
-        
-        public T GetRenderingResult()
-        {
-            if (renderedBitmap == null)
-                throw new InvalidOperationException("You need call Render method first");
-            if (!(renderedBitmap is T))
-                throw new InvalidCastException("Passed generic parameter is not appropriate for this renderer");
-
-            var bitmapAsT = (T)Convert.ChangeType(renderedBitmap, typeof(T));
-            return bitmapAsT;
-        }
-
-        public ITagsCloudRenderer<T> Render(WordsLayout layout)
-        {
+            
+        public Result<T> Render(WordsLayout layout)
+        {            
             var bitmap = new Bitmap(formatter.ImageSize.Width, formatter.ImageSize.Height);
+            if (!(bitmap is T))
+                return Result.Fail<T>($"Cannot render layout: used renderer render to Bitmap but T is {typeof(T)}");
+
             var graphics = Graphics.FromImage(bitmap);
             graphics.FillRectangle(formatter.BackgroundBrush, new Rectangle(0, 0, bitmap.Width, bitmap.Height));
 
@@ -46,8 +30,8 @@ namespace TagsCloudContainer.Dependencies
 
                 graphics.DrawString(word, font, formatter.FontBrush, rectangle);
             }
-            
-            return new DefaultTagsCloudRenderer<T>(this, bitmap);
-        }        
+                                    
+            return (T)Convert.ChangeType(bitmap, typeof(T));
+        }
     }
 }

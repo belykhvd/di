@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Linq;
 using NUnit.Framework;
 using FluentAssertions;
 using Moq;
-using FakeItEasy;
 using ApprovalTests;
 using ApprovalTests.Reporters;
 using TagsCloudContainer.Dependencies;
@@ -20,7 +17,7 @@ namespace TagsCloudContainer
         public void WordsNormalizer_ShouldDoLowerCase()
         {            
             var normalizer = new DefaultWordsNormalizer();            
-            var normalizedWord = normalizer.Normalize("lowerCase");
+            var normalizedWord = normalizer.Normalize("lowerCase").GetValueOrThrow();
             normalizedWord.Should().Be("lowercase");
         }
 
@@ -30,7 +27,7 @@ namespace TagsCloudContainer
             var filter = new DefaultWordsFilter(new[] {"i", "am"});
             var words = "i am stopword".Split(' ');
 
-            var filteredWords = words.Where(filter.IsNotStopWord);
+            var filteredWords = words.Where(word => filter.IsNotStopWord(word).GetValueOrThrow());
             filteredWords.Should().BeEquivalentTo("stopword");            
         }
 
@@ -46,14 +43,14 @@ namespace TagsCloudContainer
             var formatter = formatterMock.Object;
 
             var layouter = new CircularCloudLayouter(formatter, new Point(300, 300));
-            var layout = layouter.GetLayout(new[] {"word", "word", "word", "anotherWord", "oneMoreWord"});
+            var layout = layouter.GetLayout(new[] {"word", "word", "word", "anotherWord", "oneMoreWord"}).GetValueOrThrow();
 
             var renderer = new DefaultTagsCloudRenderer<Bitmap>(formatter);
-            var bitmap = renderer.Render(layout).GetRenderingResult();
+            var bitmap = renderer.Render(layout).GetValueOrThrow();
 
             var filename = $"{nameof(ApprovalFunctionalTest_ShouldRenderUsingFormatter)}.png";
             var bitmapSaver = new PngTagsCloudSaver(filename);
-            bitmapSaver.Save(bitmap);      
+            bitmapSaver.Save(bitmap).GetValueOrThrow();
                         
             Approvals.VerifyFile(filename);
         }

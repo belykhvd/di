@@ -2,6 +2,6 @@
 {
     public interface IWordsFilter
     {
-        bool IsNotStopWord(string word);
+        Result<bool> IsNotStopWord(string word);
     }
 }

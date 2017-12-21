@@ -15,10 +15,16 @@ namespace TagsCloudContainer.Dependencies
             this.sourceFilePath = sourceFilePath;
         }
 
-        public IEnumerable<string> GetWords()
-            => File.ReadAllText(sourceFilePath)
-                .Split(new [] {"\n","\t","\r"," "}, StringSplitOptions.RemoveEmptyEntries)
+        public Result<IEnumerable<string>> GetWords()
+        {
+            if (!File.Exists(sourceFilePath))
+                return Result.Fail<IEnumerable<string>>($"Cannot find file with words: {sourceFilePath}");
+
+            var words = File.ReadAllText(sourceFilePath)
+                .Split(new[] {"\n", "\t", "\r", " "}, StringSplitOptions.RemoveEmptyEntries)
                 .Where(line => !string.IsNullOrWhiteSpace(line))
                 .Select(line => line.Trim());
+            return Result.Ok(words);
+        }
     }
 }

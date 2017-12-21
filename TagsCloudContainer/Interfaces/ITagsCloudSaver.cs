@@ -4,6 +4,6 @@ namespace TagsCloudContainer.Interfaces
 {
     public interface ITagsCloudSaver
     {
-        void Save(Bitmap image);
+        Result<None> Save(Bitmap image);
     }
 }

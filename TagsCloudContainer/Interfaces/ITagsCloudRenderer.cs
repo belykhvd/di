@@ -2,7 +2,6 @@
 {
     public interface ITagsCloudRenderer<T>
     {
-        ITagsCloudRenderer<T> Render(WordsLayout wordsLayout);
-        T GetRenderingResult();
+        Result<T> Render(WordsLayout wordsLayout);        
     }
 }
